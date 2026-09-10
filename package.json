@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite"
+    "build": "vite build"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
