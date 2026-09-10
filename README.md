@@ -1,35 +1,25 @@
-# PC Build Bench - Frontend
+# PC Build Bench - Clean Fixed Frontend
 
-Frontend-only implementation for the 50% project review.
+Core workflow:
+Module 1 Component Management
+→ Module 2 PC Build Configuration
+→ Module 3 Compatibility & Analysis
 
-## Technology
-- React
-- Vite
-- JavaScript
-- CSS
-- Bootstrap
+Supporting modules:
+- Login
+- My Builds
+- Workload Evaluation
+- Recommendations
+- User Profile
+- Admin component management demo
 
-## Features
-- Home page
-- Demo login screen
-- Component repository
-- Search and category filtering
-- PC build dashboard
-- Component selection/replacement
-- Total cost calculation
-- Budget analysis
-- Estimated power calculation
-- CPU/Motherboard compatibility
-- RAM/Motherboard compatibility
-- PSU capacity check
+Important navigation behavior:
+- Selecting a component from Module 1 while entering from Module 2 returns to Module 2.
+- Clicking Change on a build slot opens Module 1 already filtered to that category.
+- Module 3 reads the same selected state from Module 2.
+- Login is required before the build workflow.
+- The dev script exposes Vite on the local network.
 
-## Run
-
-1. Open the folder in VS Code.
-2. Open terminal:
-   npm install
-3. Run:
-   npm run dev
-4. Open the localhost link shown by Vite.
-
-This version is frontend-only. Data is currently stored in React state and sample data is in `src/data.js`.
+Run:
+npm install
+npm run dev
