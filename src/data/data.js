@@ -18,7 +18,31 @@ export const components=[
 {id:'psu3',category:'PSU',name:'Corsair RM850e 850W 80+ Gold',brand:'Corsair',price:10499,specs:{wattage:'850 W',efficiency:'80+ Gold'}},
 {id:'case1',category:'Case',name:'DeepCool CH370',brand:'DeepCool',price:5499,specs:{formFactor:'mATX',gpuClearance:'320 mm',maxCoolerHeight:'165 mm'}},
 {id:'case2',category:'Case',name:'NZXT H5 Flow',brand:'NZXT',price:7499,specs:{formFactor:'ATX',gpuClearance:'365 mm',maxCoolerHeight:'165 mm'}},
-{id:'case3',category:'Case',name:'Compact Airflow Case 240',brand:'Demo',price:3999,specs:{formFactor:'mATX',gpuClearance:'235 mm',maxCoolerHeight:'155 mm'}}];
+{id:'case3',category:'Case',name:'Compact Airflow Case 240',brand:'Demo',price:3999,specs:{formFactor:'mATX',gpuClearance:'235 mm',maxCoolerHeight:'155 mm'}},
+{id:'cpu4',category:'CPU',name:'AMD Ryzen 5 7500F',brand:'AMD',price:15999,power:65,specs:{socket:'AM5',cores:6,threads:12,boostClock:'5.0 GHz',tdp:'65 W',performanceScore:70}},
+{id:'cpu5',category:'CPU',name:'AMD Ryzen 5 9600X',brand:'AMD',price:24999,power:65,specs:{socket:'AM5',cores:6,threads:12,boostClock:'5.4 GHz',tdp:'65 W',performanceScore:86}},
+{id:'cpu6',category:'CPU',name:'AMD Ryzen 7 9700X',brand:'AMD',price:34999,power:65,specs:{socket:'AM5',cores:8,threads:16,boostClock:'5.5 GHz',tdp:'65 W',performanceScore:94}},
+{id:'cpu7',category:'CPU',name:'Intel Core i5-13400F',brand:'Intel',price:17999,power:65,specs:{socket:'LGA1700',cores:10,threads:16,boostClock:'4.6 GHz',tdp:'65 W',performanceScore:75}},
+{id:'cpu8',category:'CPU',name:'Intel Core i7-14700F',brand:'Intel',price:37999,power:65,specs:{socket:'LGA1700',cores:20,threads:28,boostClock:'5.4 GHz',tdp:'65 W',performanceScore:97}},
+{id:'mb4',category:'Motherboard',name:'ASUS TUF Gaming B650-Plus WiFi',brand:'ASUS',price:22999,specs:{socket:'AM5',chipset:'B650',ramType:'DDR5',ramSlots:4,maxRam:'192 GB',formFactor:'ATX',maxPcieGeneration:'5.0'}},
+{id:'mb5',category:'Motherboard',name:'Gigabyte A620M S2H',brand:'Gigabyte',price:8999,specs:{socket:'AM5',chipset:'A620',ramType:'DDR5',ramSlots:2,maxRam:'96 GB',formFactor:'mATX',maxPcieGeneration:'4.0'}},
+{id:'mb6',category:'Motherboard',name:'MSI PRO B760M-P DDR4',brand:'MSI',price:10999,specs:{socket:'LGA1700',chipset:'B760',ramType:'DDR4',ramSlots:4,maxRam:'128 GB',formFactor:'mATX',maxPcieGeneration:'4.0'}},
+{id:'mb7',category:'Motherboard',name:'ASUS PRIME Z790-P WiFi',brand:'ASUS',price:26999,specs:{socket:'LGA1700',chipset:'Z790',ramType:'DDR5',ramSlots:4,maxRam:'192 GB',formFactor:'ATX',maxPcieGeneration:'5.0'}},
+{id:'ram4',category:'RAM',name:'Corsair Vengeance 16GB DDR4-3200',brand:'Corsair',price:2999,specs:{capacity:'16 GB',type:'DDR4',speed:'3200 MT/s'}},
+{id:'ram5',category:'RAM',name:'G.Skill Ripjaws V 32GB DDR4-3600',brand:'G.Skill',price:5499,specs:{capacity:'32 GB',type:'DDR4',speed:'3600 MT/s'}},
+{id:'ram6',category:'RAM',name:'Kingston Fury Beast 64GB DDR5-6000',brand:'Kingston',price:18999,specs:{capacity:'64 GB',type:'DDR5',speed:'6000 MT/s'}},
+{id:'gpu4',category:'GPU',name:'NVIDIA GeForce RTX 4060 Ti 8GB',brand:'NVIDIA',price:37999,power:160,specs:{vram:'8 GB',power:'160 W',length:'250 mm',performanceScore:82}},
+{id:'gpu5',category:'GPU',name:'NVIDIA GeForce RTX 4070 SUPER 12GB',brand:'NVIDIA',price:64999,power:220,specs:{vram:'12 GB',power:'220 W',length:'300 mm',performanceScore:100}},
+{id:'gpu6',category:'GPU',name:'AMD Radeon RX 7800 XT 16GB',brand:'AMD',price:49999,power:263,specs:{vram:'16 GB',power:'263 W',length:'300 mm',performanceScore:93}},
+{id:'gpu7',category:'GPU',name:'AMD Radeon RX 7900 GRE 16GB',brand:'AMD',price:56999,power:260,specs:{vram:'16 GB',power:'260 W',length:'320 mm',performanceScore:98}},
+{id:'st3',category:'Storage',name:'WD Blue SN580 500GB NVMe',brand:'WD',price:3999,power:5,specs:{type:'NVMe SSD',capacity:'500 GB',interface:'PCIe 4.0'}},
+{id:'st4',category:'Storage',name:'Crucial P3 Plus 1TB NVMe',brand:'Crucial',price:5999,power:7,specs:{type:'NVMe SSD',capacity:'1 TB',interface:'PCIe 4.0'}},
+{id:'st5',category:'Storage',name:'Samsung 990 PRO 2TB NVMe',brand:'Samsung',price:15999,power:8,specs:{type:'NVMe SSD',capacity:'2 TB',interface:'PCIe 4.0'}},
+{id:'psu4',category:'PSU',name:'MSI MAG A550BN 550W Bronze',brand:'MSI',price:3999,power:0,specs:{wattage:'550 W',efficiency:'80+ Bronze'}},
+{id:'psu5',category:'PSU',name:'MSI MAG A850GL 850W Gold',brand:'MSI',price:9999,power:0,specs:{wattage:'850 W',efficiency:'80+ Gold'}},
+{id:'case4',category:'Case',name:'Corsair 4000D Airflow',brand:'Corsair',price:8999,power:0,specs:{formFactor:'ATX',gpuClearance:'360 mm',maxCoolerHeight:'170 mm'}},
+{id:'case5',category:'Case',name:'Lian Li Lancool 216',brand:'Lian Li',price:9999,power:0,specs:{formFactor:'ATX',gpuClearance:'392 mm',maxCoolerHeight:'180 mm'}},
+{id:'case6',category:'Case',name:'Thermaltake Versa H18',brand:'Thermaltake',price:4499,power:0,specs:{formFactor:'mATX',gpuClearance:'350 mm',maxCoolerHeight:'155 mm'}}];
 export const workloads={Gaming:{description:'High-frame-rate gaming and GPU-heavy workloads.',gpu:1,cpu:.85,ram:.6,storage:.55},Programming:{description:'Compilers, IDEs, containers and development tools.',gpu:.3,cpu:1,ram:.9,storage:.7},Office:{description:'Documents, browsing, meetings and general productivity.',gpu:.2,cpu:.45,ram:.5,storage:.45},'Video Editing':{description:'Timeline editing, rendering and media storage.',gpu:.9,cpu:.95,ram:.95,storage:1},'AI/ML':{description:'Local model experimentation and accelerated compute.',gpu:1,cpu:.8,ram:.95,storage:.9}};
 export const defaultReqs={Performance:5,Budget:4,Upgradeability:5,'Power Efficiency':3,'Thermal/Noise':3,'Storage':3};
 export const qfdRelationships={technical:[{name:'CPU Performance',short:'CPU'},{name:'GPU Performance',short:'GPU'},{name:'RAM Capacity',short:'RAM'},{name:'Storage Capacity',short:'SSD'},{name:'PSU Headroom',short:'PSU'},{name:'Thermal Capability',short:'THERM'},{name:'Motherboard Upgradeability',short:'UPG'},{name:'Budget Efficiency',short:'BUD'}],users:Object.keys(defaultReqs),matrix:{Performance:[9,9,3,1,1,3,3,3],Budget:[3,3,3,3,3,3,3,9],Upgradeability:[3,3,9,3,9,3,9,3],'Power Efficiency':[3,3,3,3,9,9,3,3],'Thermal/Noise':[3,3,3,1,3,9,3,1],Storage:[1,1,3,9,1,1,3,3]}};
