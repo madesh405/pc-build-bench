@@ -1,0 +1,16 @@
+PC BUILD BENCH - SELENIUM TEST REPORT
+Date: 2026-10-15T18:58:31
+Website: https://madesh405.github.io/pc-build-bench/
+
+PASS: Homepage loads
+PASS: Components page opens
+PASS: Component search works
+PASS: GPU filter works
+PASS: Case filter works
+PASS: Build configuration opens
+PASS: Compatibility access control
+PASS: Recommendations access control
+
+Passed: 8
+Failed: 0
+Total: 8

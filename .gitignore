@@ -4,3 +4,7 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+# Python Selenium tests
+.venv/
+__pycache__/
+*.py[cod]
