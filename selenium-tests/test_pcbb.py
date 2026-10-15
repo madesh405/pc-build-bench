@@ -1,24 +1,28 @@
 
 import os
+import getpass
 from pathlib import Path
 from datetime import datetime
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 
 BASE_URL = os.getenv(
     "PCBB_URL",
     "https://madesh405.github.io/pc-build-bench/"
 )
-
 RESULT_DIR = Path(__file__).parent / "results"
 RESULT_DIR.mkdir(exist_ok=True)
 
 results = []
 driver = None
 wait = None
+email = ""
+password = ""
+authenticated = False
 
 
 def record(name, action):
@@ -51,46 +55,26 @@ def click_button(label):
     ).click()
 
 
-def body_text():
-    return driver.find_element(By.TAG_NAME, "body").text
-
-
-def component_rows():
-    return driver.find_elements(
-        By.CSS_SELECTOR,
-        ".catalog-table .catalog-row:not(.catalog-head)"
-    )
-
-
-def close_login_modal():
-    wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, ".login-modal .modal-close")
-        )
-    ).click()
-
-    wait.until(
-        EC.invisibility_of_element_located(
-            (By.CSS_SELECTOR, ".login-modal")
-        )
-    )
+def heading():
+    return driver.find_element(
+        By.CSS_SELECTOR, ".topbar h1"
+    ).text.strip()
 
 
 def test_homepage():
     driver.get(BASE_URL)
-
     wait.until(
         lambda d: d.execute_script(
             "return document.readyState"
         ) == "complete"
     )
-
-    assert "PC Build Bench" in body_text()
+    assert "PC Build Bench" in driver.find_element(
+        By.TAG_NAME, "body"
+    ).text
 
 
 def test_components_page():
     click_button("Components")
-
     wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, "input[placeholder='Search parts']")
@@ -99,21 +83,28 @@ def test_components_page():
 
 
 def test_component_search():
-    rows = component_rows()
-    assert rows, "No component rows displayed"
+    rows = driver.find_elements(
+        By.CSS_SELECTOR,
+        ".catalog-table .catalog-row:not(.catalog-head)"
+    )
+    assert rows, "No components displayed"
 
-    first_name = rows[0].find_element(
+    name = rows[0].find_element(
         By.CSS_SELECTOR, ".component-name b"
     ).text.strip()
-
-    assert first_name, "First component has no name"
+    assert name, "Component name is empty"
 
     search = driver.find_element(
         By.CSS_SELECTOR, "input[placeholder='Search parts']"
     )
-    search.send_keys(first_name.split()[0])
+    search.send_keys(name.split()[0])
 
-    wait.until(lambda d: len(component_rows()) > 0)
+    wait.until(
+        lambda d: len(d.find_elements(
+            By.CSS_SELECTOR,
+            ".catalog-table .catalog-row:not(.catalog-head)"
+        )) > 0
+    )
 
 
 def test_gpu_filter():
@@ -123,57 +114,80 @@ def test_gpu_filter():
     search.clear()
     click_button("GPU")
 
-    wait.until(lambda d: len(component_rows()) > 0)
+    wait.until(lambda d: len(d.find_elements(
+        By.CSS_SELECTOR, ".component-name .tag"
+    )) > 0)
 
     categories = [
-        el.text.strip().lower()
-        for el in driver.find_elements(
+        e.text.strip().lower()
+        for e in driver.find_elements(
             By.CSS_SELECTOR, ".component-name .tag"
         )
     ]
-
-    assert categories, "No GPU results found"
-    assert all(x == "gpu" for x in categories), (
-        "GPU filter displayed another category"
-    )
+    assert all(c == "gpu" for c in categories)
 
 
 def test_case_filter():
     click_button("Case")
-    wait.until(lambda d: len(component_rows()) > 0)
+    wait.until(lambda d: len(d.find_elements(
+        By.CSS_SELECTOR, ".component-name .tag"
+    )) > 0)
 
     categories = [
-        el.text.strip().lower()
-        for el in driver.find_elements(
+        e.text.strip().lower()
+        for e in driver.find_elements(
             By.CSS_SELECTOR, ".component-name .tag"
         )
     ]
-
-    assert categories, "No case results found"
-    assert all(x == "case" for x in categories), (
-        "Case filter displayed another category"
-    )
+    assert all(c == "case" for c in categories)
 
 
 def test_build_configuration():
     click_button("Build Configuration")
-
     wait.until(
-        EC.presence_of_element_located(
+        EC.visibility_of_element_located(
             (By.CSS_SELECTOR, ".builder-layout")
         )
     )
 
+
+def test_select_components():
+    for index in range(7):
+        # Re-find each select after React updates the page.
+        selects = driver.find_elements(
+            By.CSS_SELECTOR, ".builder-layout select"
+        )
+        assert len(selects) >= 7, (
+            f"Expected 7 component selectors; found {len(selects)}"
+        )
+
+        selector = Select(selects[index])
+        assert len(selector.options) > 1, (
+            f"Selector {index + 1} has no components"
+        )
+        selector.select_by_index(1)
+
     selects = driver.find_elements(
         By.CSS_SELECTOR, ".builder-layout select"
     )
+    assert all(
+        Select(s).first_selected_option.get_attribute("value")
+        for s in selects[:7]
+    ), "At least one component was not selected"
 
-    assert len(selects) >= 7, (
-        f"Expected 7 component selectors, found {len(selects)}"
+    wait.until(
+        EC.presence_of_element_located(
+            (By.CSS_SELECTOR, ".summary-line")
+        )
     )
+    assert driver.find_elements(
+        By.CSS_SELECTOR, ".analysis-list .analysis-row"
+    ), "Build analysis checks are missing"
 
 
-def test_compatibility_access_control():
+def test_login_and_compatibility():
+    global authenticated
+
     click_button("Compatibility & Analysis")
 
     modal = wait.until(
@@ -182,40 +196,163 @@ def test_compatibility_access_control():
         )
     )
 
-    heading = modal.find_element(By.TAG_NAME, "h2").text
-
-    assert heading == "Sign in to Compatibility & Analysis", (
-        f"Unexpected login heading: {heading}"
+    email_box = modal.find_element(
+        By.CSS_SELECTOR, "input[type='email']"
+    )
+    password_box = modal.find_element(
+        By.CSS_SELECTOR, "input[type='password']"
     )
 
-    close_login_modal()
+    email_box.send_keys(email)
+    password_box.send_keys(password)
+    modal.find_element(
+        By.CSS_SELECTOR, "button[type='submit']"
+    ).click()
+
+    try:
+        wait.until(
+            EC.invisibility_of_element_located(
+                (By.CSS_SELECTOR, ".login-modal")
+            )
+        )
+    except Exception:
+        errors = driver.find_elements(
+            By.CSS_SELECTOR, ".login-modal .auth-error"
+        )
+        message = errors[0].text if errors else (
+            "Login did not complete; inspect the website."
+        )
+        raise AssertionError(message)
+
+    wait.until(
+        lambda d: heading() == "Compatibility & Analysis"
+    )
+    authenticated = True
 
 
-def test_recommendations_access_control():
-    click_button("Recommendations")
+def test_compatibility_and_power():
+    assert authenticated, "Login did not succeed"
 
-    modal = wait.until(
+    wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, ".login-modal")
+            (By.CSS_SELECTOR, ".analysis-list.detailed")
         )
     )
 
-    heading = modal.find_element(By.TAG_NAME, "h2").text
-
-    assert heading == "Sign in to Recommendations", (
-        f"Unexpected login heading: {heading}"
+    body = driver.find_element(By.TAG_NAME, "body").text
+    assert "Required PSU" in body, "PSU metric not displayed"
+    assert "Estimated power" in body, (
+        "Estimated power metric not displayed"
     )
 
-    close_login_modal()
+    rows = driver.find_elements(
+        By.CSS_SELECTOR, ".analysis-list.detailed .analysis-row"
+    )
+    assert rows, "Compatibility checks are missing"
+
+
+def test_workload_evaluation():
+    click_button("Workload Evaluation")
+
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, ".work-list .work-row")
+        )
+    )
+
+    row = driver.find_elements(
+        By.CSS_SELECTOR, ".work-list .work-row"
+    )[0]
+
+    if "selected" not in row.get_attribute("class").split():
+        row.click()
+
+    wait.until(
+        lambda d: "selected" in d.find_elements(
+            By.CSS_SELECTOR, ".work-list .work-row"
+        )[0].get_attribute("class").split()
+    )
+
+
+def test_qfd_analysis():
+    click_button("QFD Analysis")
+
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, ".matrix")
+        )
+    )
+
+    assert driver.find_elements(
+        By.CSS_SELECTOR, ".range-row input[type='range']"
+    ), "QFD importance controls are missing"
+
+    assert driver.find_elements(
+        By.CSS_SELECTOR, ".priority-list"
+    ), "QFD technical priorities are missing"
+
+
+
+def test_fmea():
+    click_button("FMEA Risk Analysis")
+
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, ".table-wrap table")
+        )
+    )
+
+    headers = [
+        " ".join(th.text.split()).casefold()
+        for th in driver.find_elements(
+            By.CSS_SELECTOR, ".table-wrap table thead th"
+        )
+    ]
+
+    assert any("rpn" in h for h in headers), (
+        f"FMEA RPN column is missing. Headers found: {headers}"
+    )
+
+    assert any(
+        "failure" in h and "mode" in h for h in headers
+    ), f"FMEA failure-mode column is missing. Headers found: {headers}"
+
+
+
+def test_recommendations():
+    click_button("Recommendations")
+
+    wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, ".recommend-list")
+        )
+    )
+
+    assert heading() == "Recommendations"
+
+
+def test_admin_access():
+    click_button("Administration")
+
+    wait.until(lambda d: heading() == "Administration")
+
+    assert "Administration" in driver.find_element(
+        By.TAG_NAME, "body"
+    ).text
 
 
 def main():
-    global driver, wait
+    global driver, wait, email, password
 
-    print("=" * 55)
     print("PC BUILD BENCH - SELENIUM FUNCTIONAL TESTS")
-    print("=" * 55)
     print(f"Website: {BASE_URL}\n")
+
+    email = os.getenv("PCBB_EMAIL") or input(
+        "Account email: "
+    ).strip()
+    password = os.getenv("PCBB_PASSWORD") or getpass.getpass(
+        "Account password (hidden): "
+    )
 
     try:
         options = webdriver.ChromeOptions()
@@ -232,36 +369,33 @@ def main():
             ("GPU filter works", test_gpu_filter),
             ("Case filter works", test_case_filter),
             ("Build configuration opens", test_build_configuration),
-            (
-                "Compatibility access control",
-                test_compatibility_access_control
-            ),
-            (
-                "Recommendations access control",
-                test_recommendations_access_control
-            ),
+            ("Component selection works", test_select_components),
+            ("Login and compatibility access", test_login_and_compatibility),
+            ("Compatibility and power analysis", test_compatibility_and_power),
+            ("Workload evaluation works", test_workload_evaluation),
+            ("QFD analysis works", test_qfd_analysis),
+            ("FMEA risk analysis opens", test_fmea),
+            ("Recommendations page opens", test_recommendations),
+            ("Admin access works", test_admin_access),
         ]
 
         for name, action in tests:
             record(name, action)
 
     except Exception as exc:
-        print(f"\nBrowser startup error: {exc}")
+        print(f"Browser startup error: {exc}")
 
     finally:
         if driver:
             driver.quit()
 
-        passed = sum(status == "PASS" for _, status, _ in results)
-        failed = sum(status == "FAIL" for _, status, _ in results)
-
+        passed = sum(s == "PASS" for _, s, _ in results)
+        failed = sum(s == "FAIL" for _, s, _ in results)
         report = RESULT_DIR / "report.txt"
 
         with report.open("w", encoding="utf-8") as file:
             file.write("PC BUILD BENCH - SELENIUM TEST REPORT\n")
-            file.write(
-                f"Date: {datetime.now().isoformat(timespec='seconds')}\n"
-            )
+            file.write(f"Date: {datetime.now().isoformat(timespec='seconds')}\n")
             file.write(f"Website: {BASE_URL}\n\n")
 
             for name, status, reason in results:
@@ -269,14 +403,11 @@ def main():
                 if reason:
                     file.write(f"  Reason: {reason}\n")
 
-            file.write(f"\nPassed: {passed}\n")
-            file.write(f"Failed: {failed}\n")
+            file.write(f"\nPassed: {passed}\nFailed: {failed}\n")
             file.write(f"Total: {len(results)}\n")
 
-        print("\n" + "=" * 55)
-        print(f"PASSED: {passed} | FAILED: {failed}")
-        print(f"Report: {report}")
-        print("=" * 55)
+        print(f"\nPASSED: {passed} | FAILED: {failed}")
+        print(f"Report saved to: {report}")
 
 
 if __name__ == "__main__":
